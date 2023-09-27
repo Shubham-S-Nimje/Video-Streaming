@@ -1,17 +1,30 @@
+import axios from "axios";
 import React, { useState } from "react";
 
 const TextOverlayForm = () => {
-  const { text, setText } = useState();
-  const { size, setSize } = useState();
-  const { position, setPosition } = useState();
+  const [text, setText] = useState("");
+  const [size, setSize] = useState("");
+  const [position, setPosition] = useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    // console.log(text, size, position);
 
-    const obj = {
-      src: "/vite.svg",
-      size: "w-48",
-      position: "right-0",
+    const newData = {
+      content: text,
+      size: size,
+      position: position,
+      contentType: "text",
     };
+
+    axios
+      .post(`http://localhost:4000/upload/text-data`, newData)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error editing overlays:", error);
+      });
   };
 
   return (

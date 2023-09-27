@@ -22,8 +22,8 @@ app.use(cors());
 
 app.use("/fetch", dataRoutes);
 app.use("/upload", dataRoutes);
-// app.use("/edit", dataRoutes);
-// app.use("/delete", dataRoutes);
+app.use("/edit", dataRoutes);
+app.use("/delete", dataRoutes);
 
 mongoose
   .connect(`${MONGODB_URL}/vdostreaming?retryWrites=true&w=majority`)

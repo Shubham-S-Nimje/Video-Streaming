@@ -5,56 +5,67 @@ import ReactPlayer from "react-player";
 import TextOverlayForm from "./components/TextOverlayForm";
 import ImgOverlayForm from "./components/ImgOverlayForm";
 
-const overlaysObj = [
-  {
-    text: [
-      {
-        text: "hello",
-        size: "text-xl",
-        position: "right-0",
-      },
-      {
-        text: "hello2",
-        size: "text-3xl",
-        position: "text-center",
-      },
-      {
-        text: "hello3",
-        size: "text-3xl",
-        position: "text-right",
-      },
-    ],
-    image: [
-      {
-        src: "/vite.svg",
-        size: "w-48",
-        position: "flex justify-start",
-      },
-      {
-        src: "/vite.svg",
-        size: "w-24",
-        position: "flex justify-center",
-      },
-      {
-        src: "/vite.svg",
-        size: "w-24",
-        position: "flex justify-end",
-      },
-    ],
-  },
-];
+// const overlaysObj = [
+//   {
+//     text: [
+//       {
+//         text: "hello",
+//         size: "text-xl",
+//         position: "right-0",
+//       },
+//       {
+//         text: "hello2",
+//         size: "text-3xl",
+//         position: "text-center",
+//       },
+//       {
+//         text: "hello3",
+//         size: "text-3xl",
+//         position: "text-right",
+//       },
+//     ],
+//     image: [
+//       {
+//         src: "/vite.svg",
+//         size: "w-48",
+//         position: "flex justify-start",
+//       },
+//       {
+//         src: "/vite.svg",
+//         size: "w-24",
+//         position: "flex justify-center",
+//       },
+//       {
+//         src: "/vite.svg",
+//         size: "w-24",
+//         position: "flex justify-end",
+//       },
+//     ],
+//   },
+// ];
 
 function App() {
   const [selectedOverlay, setSelectedOverlay] = useState([]);
   const [email, setEmail] = useState("");
   const [url, setUrl] = useState("");
-  const [allOverlays, setAllOverlays] = useState(overlaysObj);
+  const [allOverlays, setAllOverlays] = useState();
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:4000/fetch/fetch-all`)
+      .then((response) => {
+        // console.log(response.data.data);
+        setAllOverlays(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching overlays:", error);
+      });
+  }, []);
 
   useEffect(() => {
     if (email !== "") {
-      // Only fetch overlays if the user has entered an email
       axios
-        .get(`/api/overlays?email=${email}`)
+        .get(`http://localhost:4000/user/add-user`)
         .then((response) => {
           setAllOverlays(response.data);
         })
@@ -62,7 +73,7 @@ function App() {
           console.error("Error fetching overlays:", error);
         });
     }
-  }, [email]); // Fetch overlays when the email changes
+  }, [email]);
 
   const handleOverlaySelect = (overlay) => {
     setSelectedOverlay(overlay);
@@ -112,14 +123,14 @@ function App() {
               <div
                 className={`absolute font-bold top-0 w-full ${selectedOverlay.position} z-20 bg-opacity-50 p-2 text-white`}
               >
-                {selectedOverlay.text && (
+                {selectedOverlay.contentType === "text" && (
                   <p className={`${selectedOverlay.size} m-4`}>
-                    {selectedOverlay.text}
+                    {selectedOverlay.content}
                   </p>
                 )}
-                {selectedOverlay.src && (
+                {selectedOverlay.contentType === "image" && (
                   <img
-                    src={selectedOverlay.src}
+                    src={selectedOverlay.content}
                     className={`${selectedOverlay.size} m-4`}
                     alt="Image Overlay"
                   />
@@ -141,13 +152,13 @@ function App() {
           <div>
             <h2 className="text-xl font-semibold mb-2">Selected Overlay</h2>
             <div className="mb-4">
-              {selectedOverlay.text ? (
-                <p>Name: {selectedOverlay.text}</p>
+              {selectedOverlay.contentType === "text" ? (
+                <p>Name: {selectedOverlay.content}</p>
               ) : (
                 <p>No text overlay selected.</p>
               )}
-              {selectedOverlay.src ? (
-                <img src={selectedOverlay.src} alt="Image Overlay" />
+              {selectedOverlay.contentType === "image" ? (
+                <img src={selectedOverlay.content} alt="Image Overlay" />
               ) : (
                 <p>No image overlay selected.</p>
               )}
